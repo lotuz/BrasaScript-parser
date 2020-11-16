@@ -46,7 +46,8 @@ const FUNC_NO_FLAGS = 0b000,
 const loneSurrogate = /[\uD800-\uDFFF]/u;
 
 const translation = {
-  _constructor: "construtor"
+  _constructor: "construtor",
+  _break: "pare"
 }
 
 export default class StatementParser extends ExpressionParser {
@@ -413,7 +414,7 @@ export default class StatementParser extends ExpressionParser {
     node: N.BreakStatement | N.ContinueStatement,
     keyword: string,
   ): N.BreakStatement | N.ContinueStatement {
-    const isBreak = keyword === "break";
+    const isBreak = keyword === translation._break;
     this.next();
 
     if (this.isLineTerminator()) {
@@ -435,7 +436,7 @@ export default class StatementParser extends ExpressionParser {
     node: N.BreakStatement | N.ContinueStatement,
     keyword: string,
   ) {
-    const isBreak = keyword === "break";
+    const isBreak = keyword === translation._break;
     let i;
     for (i = 0; i < this.state.labels.length; ++i) {
       const lab = this.state.labels[i];

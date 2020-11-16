@@ -1,6 +1,6 @@
 {
-  "name": "brasa-parser",
-  "version": "7.12.5",
+  "name": "@babel/parser",
+  "version": "7.12.502",
   "description": "A Brasa parser. A fork of babel for portuguese",
   "author": "Marcelo L. Lotufo <marcelo@lotuz.dev>",
   "homepage": "https://marceloll.com/",

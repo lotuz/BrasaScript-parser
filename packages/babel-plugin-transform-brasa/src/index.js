@@ -1,5 +1,5 @@
 import { declare } from "@babel/helper-plugin-utils";
-import { parse } from '../../babel-parser/lib';
+import { parse } from 'brasa-parser';
 
 export default declare(api => {
   api.assertVersion(7);

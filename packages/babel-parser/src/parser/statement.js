@@ -45,6 +45,10 @@ const FUNC_NO_FLAGS = 0b000,
 
 const loneSurrogate = /[\uD800-\uDFFF]/u;
 
+const translation = {
+  _constructor: "construtor"
+}
+
 export default class StatementParser extends ExpressionParser {
   // ### Statement parsing
 
@@ -1189,8 +1193,8 @@ export default class StatementParser extends ExpressionParser {
     return (
       !method.computed &&
       !method.static &&
-      (method.key.name === "constructor" || // Identifier
-        method.key.value === "constructor") // String literal
+      (method.key.name === translation._constructor || // Identifier
+        method.key.value === translation._constructor) // String literal
     );
   }
 
@@ -1551,7 +1555,7 @@ export default class StatementParser extends ExpressionParser {
   pushClassProperty(classBody: N.ClassBody, prop: N.ClassProperty) {
     if (
       !prop.computed &&
-      (prop.key.name === "constructor" || prop.key.value === "constructor")
+      (prop.key.name === translation._constructor || prop.key.value === translation._constructor)
     ) {
       // Non-computed field, which is either an identifier named "constructor"
       // or a string literal named "constructor"

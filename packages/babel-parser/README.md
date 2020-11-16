@@ -1,19 +1,10 @@
-# @babel/parser
+# brasa-parser
 
-> A JavaScript parser
+> A Brasa parser. A fork of babel for portuguese.
 
-See our website [@babel/parser](https://babeljs.io/docs/en/babel-parser) for more information or the [issues](https://github.com/babel/babel/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3A%22pkg%3A%20parser%20(babylon)%22+is%3Aopen) associated with this package.
+This is a fork of @babel/parser that modifies it just enough to recognize 
+javascript keywords in portuguese. This way the AST is correctly built from 
+brasa code, but in the end normal javascript will be output.
 
-## Install
+brasa-parser is just a proof of concept for now.
 
-Using npm:
-
-```sh
-npm install --save-dev @babel/parser
-```
-
-or using yarn:
-
-```sh
-yarn add @babel/parser --dev
-```

@@ -1,0 +1,19 @@
+{
+  "name": "babel-plugin-transform-brasa",
+  "version": "7.12.3",
+  "description": "Babel plugin for curry function",
+  "main": "lib/index.js",
+  "keywords": [
+    "babel-plugin"
+  ],
+  "dependencies": {
+    "@babel/helper-plugin-utils": "^7.10.4"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.12.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/helper-plugin-test-runner": "^7.10.4"
+  }
+}

@@ -1,6 +1,5 @@
 import { declare } from "@babel/helper-plugin-utils";
-// import { parse } from 'brasa-parser';
-import { parse } from '../../babel-parser/lib';
+import { parse } from 'brasa-parser';
 
 export default declare(api => {
   api.assertVersion(7);
@@ -27,7 +26,6 @@ export default declare(api => {
         }
       },
       BinaryExpression(path) {
-        console.log(path);
         if (path.node.operator === "instânciade") {
           path.node.operator = "instanceof";
         }

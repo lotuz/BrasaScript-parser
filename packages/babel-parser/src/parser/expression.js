@@ -55,6 +55,7 @@ import {
   newExpressionScope,
 } from "../util/expression-scope.js";
 import { Errors } from "./error";
+import translation from "../translations";
 
 export default class ExpressionParser extends LValParser {
   // Forward-declaration: defined in statement.js
@@ -239,7 +240,7 @@ export default class ExpressionParser extends LValParser {
   ): N.Expression {
     const startPos = this.state.start;
     const startLoc = this.state.startLoc;
-    if (this.isContextual("yield")) {
+    if (this.isContextual(translation._yield)) {
       if (this.prodParam.hasYield) {
         // If we have [Yield] production, `yield` will start a YieldExpression thus
         // regex is allowed following. Otherwise `yield` is an identifier and regex
@@ -410,7 +411,7 @@ export default class ExpressionParser extends LValParser {
         ) {
           if (
             this.match(tt.name) &&
-            this.state.value === "await" &&
+            this.state.value === translation._await &&
             this.prodParam.hasAwait
           ) {
             throw this.raise(
@@ -491,7 +492,7 @@ export default class ExpressionParser extends LValParser {
   // Parse unary operators, both prefix and postfix.
   // https://tc39.es/ecma262/#prod-UnaryExpression
   parseMaybeUnary(refExpressionErrors: ?ExpressionErrors): N.Expression {
-    if (this.isContextual("await") && this.isAwaitAllowed()) {
+    if (this.isContextual(translation._await) && this.isAwaitAllowed()) {
       return this.parseAwait();
     }
     const update = this.match(tt.incDec);
@@ -790,7 +791,7 @@ export default class ExpressionParser extends LValParser {
   atPossibleAsyncArrow(base: N.Expression): boolean {
     return (
       base.type === "Identifier" &&
-      base.name === "async" &&
+      base.name === translation._async &&
       this.state.lastTokEnd === base.end &&
       !this.canInsertSemicolon() &&
       // check there are no escape sequences, such as \u{61}sync
@@ -960,7 +961,7 @@ export default class ExpressionParser extends LValParser {
         const containsEsc = this.state.containsEsc;
         const id = this.parseIdentifier();
 
-        if (!containsEsc && id.name === "async" && !this.canInsertSemicolon()) {
+        if (!containsEsc && id.name === translation._async && !this.canInsertSemicolon()) {
           if (this.match(tt._function)) {
             const last = this.state.context.length - 1;
             if (this.state.context[last] !== ct.functionStatement) {
@@ -1257,7 +1258,7 @@ export default class ExpressionParser extends LValParser {
     if (this.prodParam.hasYield && this.match(tt.dot)) {
       const meta = this.createIdentifier(
         this.startNodeAtNode(node),
-        "function",
+        translation._function,
       );
       this.next(); // eat `.`
       return this.parseMetaProperty(node, meta, "sent");
@@ -1272,7 +1273,7 @@ export default class ExpressionParser extends LValParser {
   ): N.MetaProperty {
     node.meta = meta;
 
-    if (meta.name === "function" && propertyName === "sent") {
+    if (meta.name === translation._function && propertyName === "sent") {
       // https://github.com/tc39/proposal-function.sent#syntax-1
       if (this.isContextual(propertyName)) {
         this.expectPlugin("functionSent");
@@ -1300,7 +1301,7 @@ export default class ExpressionParser extends LValParser {
 
   // https://tc39.es/ecma262/#prod-ImportMeta
   parseImportMetaProperty(node: N.MetaProperty): N.MetaProperty {
-    const id = this.createIdentifier(this.startNodeAtNode(node), "import");
+    const id = this.createIdentifier(this.startNodeAtNode(node), translation._import);
     this.next(); // eat `.`
 
     if (this.isContextual("meta")) {
@@ -1466,7 +1467,7 @@ export default class ExpressionParser extends LValParser {
     this.next();
     if (this.match(tt.dot)) {
       // https://tc39.es/ecma262/#prod-NewTarget
-      const meta = this.createIdentifier(this.startNodeAtNode(node), "new");
+      const meta = this.createIdentifier(this.startNodeAtNode(node), translation._new);
       this.next();
       const metaProp = this.parseMetaProperty(node, meta, "target");
 
@@ -1714,14 +1715,14 @@ export default class ExpressionParser extends LValParser {
       const keyName = key.name;
       // https://tc39.es/ecma262/#prod-AsyncMethod
       // https://tc39.es/ecma262/#prod-AsyncGeneratorMethod
-      if (keyName === "async" && !this.hasPrecedingLineBreak()) {
+      if (keyName === translation._async && !this.hasPrecedingLineBreak()) {
         isAsync = true;
         isGenerator = this.eat(tt.star);
         this.parsePropertyName(prop, /* isPrivateNameAllowed */ false);
       }
       // get PropertyName[?Yield, ?Await] () { FunctionBody[~Yield, ~Await] }
       // set PropertyName[?Yield, ?Await] ( PropertySetParameterList ) { FunctionBody[~Yield, ~Await] }
-      if (keyName === "get" || keyName === "set") {
+      if (keyName === translation._get || keyName === translation._set) {
         isAccessor = true;
         prop.kind = keyName;
         if (this.match(tt.star)) {
@@ -2293,12 +2294,12 @@ export default class ExpressionParser extends LValParser {
     checkKeywords: boolean,
     isBinding: boolean,
   ): void {
-    if (this.prodParam.hasYield && word === "yield") {
+    if (this.prodParam.hasYield && word === translation._yield) {
       this.raise(startLoc, Errors.YieldBindingIdentifier);
       return;
     }
 
-    if (word === "await") {
+    if (word === translation._await) {
       if (this.prodParam.hasAwait) {
         this.raise(startLoc, Errors.AwaitBindingIdentifier);
         return;
@@ -2313,7 +2314,7 @@ export default class ExpressionParser extends LValParser {
     if (
       this.scope.inClass &&
       !this.scope.inNonArrowFunction &&
-      word === "arguments"
+      word === translation._arguments
     ) {
       this.raise(startLoc, Errors.ArgumentsInClass);
       return;
@@ -2330,7 +2331,7 @@ export default class ExpressionParser extends LValParser {
       : isStrictReservedWord;
 
     if (reservedTest(word, this.inModule)) {
-      if (!this.prodParam.hasAwait && word === "await") {
+      if (!this.prodParam.hasAwait && word === translation._await) {
         this.raise(
           startLoc,
           this.hasPlugin("topLevelAwait")

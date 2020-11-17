@@ -35,6 +35,8 @@ import {
   newParameterDeclarationScope,
 } from "../util/expression-scope";
 
+import translation from "../translations";
+
 const loopLabel = { kind: "loop" },
   switchLabel = { kind: "switch" };
 
@@ -44,11 +46,6 @@ const FUNC_NO_FLAGS = 0b000,
   FUNC_NULLABLE_ID = 0b100;
 
 const loneSurrogate = /[\uD800-\uDFFF]/u;
-
-const translation = {
-  _constructor: "construtor",
-  _break: "pare"
-}
 
 export default class StatementParser extends ExpressionParser {
   // ### Statement parsing
@@ -121,7 +118,7 @@ export default class StatementParser extends ExpressionParser {
   }
 
   isLet(context: ?string): boolean {
-    if (!this.isContextual("let")) {
+    if (!this.isContextual(translation._let)) {
       return false;
     }
     const next = this.nextTokenStart();
@@ -497,7 +494,7 @@ export default class StatementParser extends ExpressionParser {
     this.state.labels.push(loopLabel);
 
     let awaitAt = -1;
-    if (this.isAwaitAllowed() && this.eatContextual("await")) {
+    if (this.isAwaitAllowed() && this.eatContextual(translation._await)) {
       awaitAt = this.state.lastTokStart;
     }
     this.scope.enter(SCOPE_OTHER);
@@ -519,7 +516,7 @@ export default class StatementParser extends ExpressionParser {
       this.finishNode(init, "VariableDeclaration");
 
       if (
-        (this.match(tt._in) || this.isContextual("of")) &&
+        (this.match(tt._in) || this.isContextual(translation._of)) &&
         init.declarations.length === 1
       ) {
         return this.parseForIn(node, init, awaitAt);
@@ -532,9 +529,9 @@ export default class StatementParser extends ExpressionParser {
 
     const refExpressionErrors = new ExpressionErrors();
     const init = this.parseExpression(true, refExpressionErrors);
-    if (this.match(tt._in) || this.isContextual("of")) {
+    if (this.match(tt._in) || this.isContextual(translation._of)) {
       this.toAssignable(init, /* isLHS */ true);
-      const description = this.isContextual("of")
+      const description = this.isContextual(translation._of)
         ? "for-of statement"
         : "for-in statement";
       this.checkLVal(init, undefined, undefined, description);
@@ -938,7 +935,7 @@ export default class StatementParser extends ExpressionParser {
       // outside of the loop body.
       this.withTopicForbiddingContext(() =>
         // Parse the loop body.
-        this.parseStatement("for"),
+        this.parseStatement(translation._for),
       );
 
     this.scope.exit();
@@ -1022,7 +1019,7 @@ export default class StatementParser extends ExpressionParser {
       } else {
         if (
           kind === "const" &&
-          !(this.match(tt._in) || this.isContextual("of"))
+          !(this.match(tt._in) || this.isContextual(translation._of))
         ) {
           // `const` with no initializer is allowed in TypeScript.
           // It could be a declaration like `const x: number;`.
@@ -1035,7 +1032,7 @@ export default class StatementParser extends ExpressionParser {
           }
         } else if (
           decl.id.type !== "Identifier" &&
-          !(isFor && (this.match(tt._in) || this.isContextual("of")))
+          !(isFor && (this.match(tt._in) || this.isContextual(translation._of)))
         ) {
           this.raise(
             this.state.lastTokEnd,
@@ -1420,7 +1417,7 @@ export default class StatementParser extends ExpressionParser {
       }
     } else if (
       isSimple &&
-      key.name === "async" &&
+      key.name === translation._async &&
       !containsEsc &&
       !this.isLineTerminator()
     ) {
@@ -1767,7 +1764,7 @@ export default class StatementParser extends ExpressionParser {
   }
 
   maybeParseExportNamespaceSpecifier(node: N.Node): boolean {
-    if (this.isContextual("as")) {
+    if (this.isContextual(translation._as)) {
       if (!node.specifiers) node.specifiers = [];
 
       const specifier = this.startNodeAt(
@@ -1810,11 +1807,11 @@ export default class StatementParser extends ExpressionParser {
   }
 
   isAsyncFunction(): boolean {
-    if (!this.isContextual("async")) return false;
+    if (!this.isContextual(translation._async)) return false;
     const next = this.nextTokenStart();
     return (
       !lineBreak.test(this.input.slice(this.state.pos, next)) &&
-      this.isUnparsedContextual(next, "function")
+      this.isUnparsedContextual(next, translation._function)
     );
   }
 
@@ -1862,7 +1859,7 @@ export default class StatementParser extends ExpressionParser {
   isExportDefaultSpecifier(): boolean {
     if (this.match(tt.name)) {
       const value = this.state.value;
-      if ((value === "async" && !this.state.containsEsc) || value === "let") {
+      if ((value === translation._async && !this.state.containsEsc) || value === translation._let ) {
         return false;
       }
       if (
@@ -1875,7 +1872,7 @@ export default class StatementParser extends ExpressionParser {
         // note that this approach may fail on some pedantic cases
         // export type from = number
         if (
-          (l.type === tt.name && l.value !== "from") ||
+          (l.type === tt.name && l.value !== translation._from) ||
           l.type === tt.braceL
         ) {
           this.expectOnePlugin(["flow", "typescript"]);
@@ -1887,7 +1884,7 @@ export default class StatementParser extends ExpressionParser {
     }
 
     const next = this.nextTokenStart();
-    const hasFrom = this.isUnparsedContextual(next, "from");
+    const hasFrom = this.isUnparsedContextual(next, translation._from);
     if (
       this.input.charCodeAt(next) === charCodes.comma ||
       (this.match(tt.name) && hasFrom)
@@ -1908,7 +1905,7 @@ export default class StatementParser extends ExpressionParser {
   }
 
   parseExportFrom(node: N.ExportNamedDeclaration, expect?: boolean): void {
-    if (this.eatContextual("from")) {
+    if (this.eatContextual(translation._from)) {
       node.source = this.parseImportSource();
       this.checkExport(node);
       const assertions = this.maybeParseImportAssertions();
@@ -1939,10 +1936,10 @@ export default class StatementParser extends ExpressionParser {
     }
 
     return (
-      this.state.type.keyword === "var" ||
-      this.state.type.keyword === "const" ||
-      this.state.type.keyword === "function" ||
-      this.state.type.keyword === "class" ||
+      this.state.type.keyword === translation._var ||
+      this.state.type.keyword === translation._const ||
+      this.state.type.keyword === translation._function ||
+      this.state.type.keyword === translation._class ||
       this.isLet() ||
       this.isAsyncFunction()
     );
@@ -1964,7 +1961,7 @@ export default class StatementParser extends ExpressionParser {
             .declaration;
           if (
             declaration.type === "Identifier" &&
-            declaration.name === "from" &&
+            declaration.name === translation._from &&
             declaration.end - declaration.start === 4 && // does not contain escape
             !declaration.extra?.parenthesized
           ) {
@@ -2086,7 +2083,7 @@ export default class StatementParser extends ExpressionParser {
 
       const node = this.startNode();
       node.local = this.parseModuleExportName();
-      node.exported = this.eatContextual("as")
+      node.exported = this.eatContextual(translation._as)
         ? this.parseModuleExportName()
         : node.local.__clone();
       nodes.push(this.finishNode(node, "ExportSpecifier"));
@@ -2139,7 +2136,7 @@ export default class StatementParser extends ExpressionParser {
       // now we check if we need to parse the next imports
       // but only if they are not importing * (everything)
       if (parseNext && !hasStar) this.parseNamedImportSpecifiers(node);
-      this.expectContextual("from");
+      this.expectContextual(translation._from);
     }
     node.source = this.parseImportSource();
     // https://github.com/tc39/proposal-import-assertions
@@ -2337,7 +2334,7 @@ export default class StatementParser extends ExpressionParser {
     if (this.match(tt.star)) {
       const specifier = this.startNode();
       this.next();
-      this.expectContextual("as");
+      this.expectContextual(translation._as);
 
       this.parseImportSpecifierLocal(
         node,

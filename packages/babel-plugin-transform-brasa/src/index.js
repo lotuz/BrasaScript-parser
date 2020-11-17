@@ -1,5 +1,6 @@
 import { declare } from "@babel/helper-plugin-utils";
-import { parse } from 'brasa-parser';
+// import { parse } from 'brasa-parser';
+import { parse } from '../../babel-parser/lib';
 
 export default declare(api => {
   api.assertVersion(7);
@@ -16,6 +17,17 @@ export default declare(api => {
           path.node.name = "constructor";
         }
       },
+      UnaryExpression(path) {
+        if (path.node.operator === "tipode") {
+          path.node.operator = "typeof";
+        }
+      },
+      BinaryExpression(path) {
+        console.log(path);
+        if (path.node.operator === "instânciade") {
+          path.node.operator = "instanceof";
+        }
+      }
     },
   };
 });

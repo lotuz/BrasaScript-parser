@@ -16,6 +16,10 @@ export default declare(api => {
         if (path.node.name === "construtor") {
           path.node.name = "constructor";
         }
+
+        if (path.node.name === "argumentos") {
+          path.node.name = "arguments";
+        }
       },
       UnaryExpression(path) {
         if (path.node.operator === "tipode") {

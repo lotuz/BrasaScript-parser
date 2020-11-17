@@ -1,4 +1,4 @@
-assinc função teste (bool) {
+assinc função teste(bool) {
   se (bool) {
     espere teste(falso);
   }

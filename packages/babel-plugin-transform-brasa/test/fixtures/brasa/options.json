@@ -1,3 +1,4 @@
 {
-  "plugins": ["babel-plugin-transform-brasa"]
+  "plugins": ["babel-plugin-transform-brasa"],
+  "sourceType": "unambiguous"
 }

@@ -1,4 +1,4 @@
-async function teste (bool) {
+async function teste(bool) {
   if (bool) {
     await teste(false);
   }

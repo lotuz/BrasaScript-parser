@@ -23,6 +23,8 @@
 // to know when parsing a label, in order to allow or disallow
 // continue jumps to that label.
 
+import translation from "../translations";
+
 const beforeExpr = true;
 const startsExpr = true;
 const isLoop = true;
@@ -71,45 +73,6 @@ export class TokenType {
 }
 
 export const keywords = new Map<string, TokenType>();
-
-const translation = {
-  _break: "pare",
-  _case: "caso",
-  _catch: "pegue",
-  _continue: "continue",
-  _debugger: "depurador",
-  _default: "padrão",
-  _do: "faça",
-  _else: "senão",
-  _finally: "finalmente",
-  _for: "para",
-  _function: "função",
-  _if: "se",
-  _return: "retorne",
-  _switch: "escolha",
-  _throw: "lançe",
-  _try: "tente",
-  _var: "var",
-  _const: "const",
-  _while: "enquanto",
-  _with: "com",
-  _new: "novo",
-  _this: "isto",
-  _super: "super",
-  _class: "classe",
-  _extends: "estende",
-  _export: "exportar",
-  _import: "importar",
-  _null: "nulo",
-  _true: "verdadeiro",
-  _false: "falso",
-  _in: "em",
-  _instanceof: "instânciade",
-  _typeof: "tipode",
-  _void: "vazio",
-  _delete: "delete",
-};
-
 
 function createKeyword(name: string, options: TokenOptions = {}): TokenType {
   options.keyword = name;

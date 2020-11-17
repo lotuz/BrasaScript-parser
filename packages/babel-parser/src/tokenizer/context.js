@@ -5,6 +5,7 @@
 // See https://github.com/mozilla/sweet.js/wiki/design
 
 import { types as tt } from "./types";
+import translation from "../translations";
 
 export class TokContext {
   constructor(
@@ -35,8 +36,8 @@ export const types: {
   parenStatement: new TokContext("(", false),
   parenExpression: new TokContext("(", true),
   template: new TokContext("`", true, true, p => p.readTmplToken()),
-  functionExpression: new TokContext("function", true),
-  functionStatement: new TokContext("function", false),
+  functionExpression: new TokContext(translation._function, true),
+  functionStatement: new TokContext(translation._function, false),
 };
 
 // Token-specific context update code
@@ -56,7 +57,7 @@ tt.parenR.updateContext = tt.braceR.updateContext = function () {
   }
 
   let out = this.state.context.pop();
-  if (out === types.braceStatement && this.curContext().token === "function") {
+  if (out === types.braceStatement && this.curContext().token === translation._function) {
     out = this.state.context.pop();
   }
 
@@ -67,7 +68,7 @@ tt.name.updateContext = function (prevType) {
   let allowed = false;
   if (prevType !== tt.dot) {
     if (
-      this.state.value === "of" &&
+      this.state.value === translation._of &&
       !this.state.exprAllowed &&
       prevType !== tt._function &&
       prevType !== tt._class
